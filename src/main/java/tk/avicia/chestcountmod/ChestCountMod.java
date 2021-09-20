@@ -8,6 +8,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import tk.avicia.chestcountmod.configs.Config;
+import tk.avicia.chestcountmod.configs.ConfigsCommand;
+import tk.avicia.chestcountmod.configs.ConfigSetting;
 
 import java.awt.*;
 import java.util.Random;
@@ -17,7 +21,13 @@ import java.util.Random;
 public class ChestCountMod {
     public static final String MODID = "chestcountmod";
     public static final String NAME = "ChestCountMod";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1";
+
+    public static final Config CONFIG = new Config(new ConfigSetting[]{
+            new ConfigSetting("Randomize color of Loot Chest names", new String[]{"Enabled", "Disabled"}, "Enabled", "enableColoredName"),
+            new ConfigSetting("Always display dry count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowDry"),
+            new ConfigSetting("Dry count location", new String[]{"Below Map", "Center", "Top Right"}, "Below Map", "dryCountLocation")
+    });
 
     private static final ChestCountData CHEST_COUNT_DATA = new ChestCountData();
     private static final MythicData MYTHIC_DATA = new MythicData();
@@ -45,11 +55,21 @@ public class ChestCountMod {
         fontRenderer.drawString(text, x, y, color.getRGB());
     }
 
-    @EventHandler
+    public static void drawCenteredString(String text, int x, int y, Color color) {
+        FontRenderer fontRenderer = getMC().fontRenderer;
+        fontRenderer.drawString(text, x - fontRenderer.getStringWidth(text) / 2, y, color.getRGB());
+    }
 
+    @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new EventHandlerClass());
-        ClientCommandHandler.instance.registerCommand(new CommandHandler());
+        ClientCommandHandler.instance.registerCommand(new LastMythicCommand());
+        ClientCommandHandler.instance.registerCommand(new ConfigsCommand());
+    }
+
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        CONFIG.initializeConfigs();
     }
 
 }

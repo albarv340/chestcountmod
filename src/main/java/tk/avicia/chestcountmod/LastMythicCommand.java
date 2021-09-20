@@ -12,7 +12,7 @@ import net.minecraftforge.client.IClientCommand;
 import java.util.Arrays;
 import java.util.List;
 
-public class CommandHandler extends CommandBase implements IClientCommand {
+public class LastMythicCommand extends CommandBase implements IClientCommand {
     @Override
     public boolean allowUsageWithoutPrefix(ICommandSender sender, String message) {
         return false;
