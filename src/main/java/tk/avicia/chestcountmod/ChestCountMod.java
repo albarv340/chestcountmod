@@ -27,7 +27,8 @@ public class ChestCountMod {
             new ConfigSetting("Randomize color of Loot Chest names", new String[]{"Enabled", "Disabled"}, "Enabled", "enableColoredName"),
             new ConfigSetting("Say mythic type in chat on mythic found", new String[]{"Enabled", "Disabled"}, "Enabled", "displayMythicTypeOnFind"),
             new ConfigSetting("Always display dry count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowDry"),
-            new ConfigSetting("Dry count location", new String[]{"Below Map", "Center", "Top Right"}, "Below Map", "dryCountLocation")
+            new ConfigSetting("Always display last mythic on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowLastMythic"),
+            new ConfigSetting("Display location", new String[]{"Below Map", "Center", "Top Right"}, "Below Map", "dryCountLocation")
     });
 
     private static final ChestCountData CHEST_COUNT_DATA = new ChestCountData();

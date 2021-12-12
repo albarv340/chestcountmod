@@ -107,12 +107,9 @@ public class EventHandlerClass {
                                 if (itemLevel.isPresent()) {
                                     // A new mythic has been found!
                                     String mythicString = itemStack.getDisplayName() + " " + itemLevel.get();
-                                    if(ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind"))
-                                    {
+                                    if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind")) {
                                         ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
                                     }
                                     EntityPlayerSP player = ChestCountMod.getMC().player;
@@ -190,13 +187,17 @@ public class EventHandlerClass {
             put("Top Right", new Point(screenWidth - ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2 - 10 - padding, 35));
         }};
 
-        if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry")) {
+        if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry") || ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic")) {
             Point location = dryCountLocations.get(ChestCountMod.CONFIG.getConfig("dryCountLocation"));
-            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + 1, Color.BLACK);
-            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y, Color.WHITE);
-            if (lastMythic.length() != 0) {
-                ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + 12 + 1, Color.BLACK);
-                ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + 12, new Color(168, 0, 168));
+            if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry")) {
+                ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + 1, Color.BLACK);
+                ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y, Color.WHITE);
+            }
+            if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic")) {
+                if (lastMythic.length() != 0) {
+                    ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + 12 + 1, Color.BLACK);
+                    ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + 12, new Color(168, 0, 168));
+                }
             }
         }
     }
