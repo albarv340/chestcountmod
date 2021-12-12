@@ -26,11 +26,11 @@ public class Config {
     }
 
     /*
-    * If the setting is a boolean and is true, this will return true, otherwise false
+     * If the setting is a boolean and is true, this will return true, otherwise false
      */
     public boolean getConfigBoolean(String configKey) {
         String configValue = getConfig(configKey);
-
+        if (configValue == null) return false;
         return configValue.equals("Enabled");
     }
 

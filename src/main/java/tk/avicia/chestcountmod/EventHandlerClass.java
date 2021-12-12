@@ -96,16 +96,25 @@ public class EventHandlerClass {
                     ItemStack itemStack = lowerInventory.getStackInSlot(i);
                     if (!itemStack.getDisplayName().equals("Air")) {
                         List<String> lore = itemStack.getTooltip(ChestCountMod.getMC().player, ITooltipFlag.TooltipFlags.ADVANCED);
+                        // Find whether the lore includes Tier: Mythic
                         Optional<String> mythicTier = lore.stream()
                                 .filter(line -> Objects.requireNonNull(TextFormatting.getTextWithoutFormattingCodes(line)).contains("Tier: Mythic")).findFirst();
                         Optional<String> itemLevel = lore.stream()
                                 .filter(line -> line.contains("Lv. ")).findFirst();
 
                         if (mythicTier.isPresent()) {
-                            if (!hasMythicBeenRegistered) {
+                            if (!hasMythicBeenRegistered) { // Makes sure you don't register the same mythic twice
                                 if (itemLevel.isPresent()) {
+                                    // A new mythic has been found!
                                     String mythicString = itemStack.getDisplayName() + " " + itemLevel.get();
-                                    ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                    if(ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind"))
+                                    {
+                                        ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                    }
+                                    else
+                                    {
+                                        ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                    }
                                     EntityPlayerSP player = ChestCountMod.getMC().player;
                                     ChestCountMod.getMythicData().addMythic(ChestCountMod.getChestCountData().getTotalChestCount(), TextFormatting.getTextWithoutFormattingCodes(mythicString), this.chestsDry, player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                                 }
@@ -114,6 +123,7 @@ public class EventHandlerClass {
                         }
                     }
                 }
+                // After checking every item in the chest
                 if (isMythicInChest) {
                     if (!this.hasMythicBeenRegistered) {
                         this.hasMythicBeenRegistered = true;
@@ -166,16 +176,18 @@ public class EventHandlerClass {
         String shortLastMythic = "";
         if (lastMythic.length() != 0) {
             try {
-                shortLastMythic = lastMythic.substring(0, lastMythic.indexOf("Lv") - 2) + lastMythic.substring(lastMythic.length() - 5);
+                String[] wordsInString = lastMythic.split(" ");
+                shortLastMythic = wordsInString[1] + " " + wordsInString[wordsInString.length - 1];
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
         }
         String finalLastMythic = "Last Mythic: " + shortLastMythic;
+        int padding = lastMythic.length() == 0 ? ChestCountMod.getMC().fontRenderer.getStringWidth("" + dry) / 2 : 0;
         final Map<String, Point> dryCountLocations = new HashMap<String, Point>() {{
-            put("Below Map", new Point(10 + ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2, screenHeight / 2 - 20));
             put("Center", new Point(screenWidth / 2, 20));
-            put("Top Right", new Point(screenWidth - ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2 - 10, 35));
+            put("Below Map", new Point(padding + 10 + ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2, screenHeight / 2 - 20));
+            put("Top Right", new Point(screenWidth - ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2 - 10 - padding, 35));
         }};
 
         if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry")) {
