@@ -1,6 +1,7 @@
 package tk.avicia.chestcountmod;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -166,7 +167,10 @@ public class EventHandlerClass {
         int dry = ChestCountMod.getMythicData().getChestsDry();
         String lastMythic = "";
         try {
-            lastMythic = ChestCountMod.getMythicData().getLastMythic().get("mythic").getAsString();
+            JsonObject lastMythicObject = ChestCountMod.getMythicData().getLastMythic();
+            if (lastMythicObject != null) {
+                lastMythic = lastMythicObject.get("mythic").getAsString();
+            }
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
