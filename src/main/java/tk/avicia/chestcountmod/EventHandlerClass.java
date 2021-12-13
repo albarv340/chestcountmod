@@ -2,6 +2,8 @@ package tk.avicia.chestcountmod;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -10,10 +12,12 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -28,9 +32,19 @@ public class EventHandlerClass {
             TextFormatting.LIGHT_PURPLE, TextFormatting.DARK_BLUE, TextFormatting.DARK_GREEN, TextFormatting.DARK_RED,
             TextFormatting.DARK_PURPLE, TextFormatting.BLUE};
 
-    private boolean hasMythicBeenRegistered = false;
+    private boolean hasChestBeenRegistered = false;
     private int chestsDry = 0;
+    private BlockPos chestLocation = null;
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void openChest(PlayerInteractEvent.RightClickBlock e) {
+        if (e.isCanceled()) return;
+        BlockPos pos = e.getPos();
+        IBlockState state = e.getEntityPlayer().world.getBlockState(pos);
+        if (!(state.getBlock() instanceof BlockContainer)) return;
+        chestLocation = pos.toImmutable();
+        hasChestBeenRegistered = false; // we could change this to "hasChestBeenRegistered" and set it to true as soon as items were found
+    }
 
     @SubscribeEvent
     public void onGuiOpen(GuiScreenEvent.InitGuiEvent event) {
@@ -57,7 +71,6 @@ public class EventHandlerClass {
                 ChestCountMod.getMythicData().addToDry();
                 this.chestsDry = ChestCountMod.getMythicData().getChestsDry();
                 // Defaults to not having a mythic in the chest
-                this.hasMythicBeenRegistered = false;
                 lowerInventory.setCustomName((ChestCountMod.CONFIG.getConfigBoolean("enableColoredName") ? ChestCountMod.getRandom(colors) : "") + containerName + " #" +
                         ChestCountMod.getChestCountData().getSessionChestCount()
                         + " Tot: " + ChestCountMod.getChestCountData().getTotalChestCount());
@@ -91,7 +104,6 @@ public class EventHandlerClass {
                 if (itemCount == 0) {
                     return; // If there are no items on the chest (or the items haven't loaded) just try again basically
                 }
-                boolean isMythicInChest = false;
 
                 for (int i = 0; i < 27; i++) {
                     ItemStack itemStack = lowerInventory.getStackInSlot(i);
@@ -104,29 +116,29 @@ public class EventHandlerClass {
                                 .filter(line -> line.contains("Lv. ")).findFirst();
 
                         if (mythicTier.isPresent()) {
-                            if (!hasMythicBeenRegistered) { // Makes sure you don't register the same mythic twice
+                            if (!this.hasChestBeenRegistered) { // Makes sure you don't register the same mythic twice (Or just put a mythic into the chest)
                                 if (itemLevel.isPresent()) {
-                                    // A new mythic has been found!
-                                    String mythicString = itemStack.getDisplayName() + " " + itemLevel.get();
-                                    if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind")) {
-                                        ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
-                                    } else {
-                                        ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                    try {
+                                        // A new mythic has been found!
+                                        String mythicString = itemStack.getDisplayName() + " " + itemLevel.get();
+                                        if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind")) {
+                                            ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                        } else {
+                                            ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                        }
+                                        EntityPlayerSP player = ChestCountMod.getMC().player;
+                                        ChestCountMod.getMythicData().addMythic(ChestCountMod.getChestCountData().getTotalChestCount(), TextFormatting.getTextWithoutFormattingCodes(mythicString), this.chestsDry, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ());
+                                    } catch (Exception e) {
+                                        // If a mythic is in the chest, just catch every exception (I don't want to risk a crash with a mythic in the chest)
+                                        e.printStackTrace();
                                     }
-                                    EntityPlayerSP player = ChestCountMod.getMC().player;
-                                    ChestCountMod.getMythicData().addMythic(ChestCountMod.getChestCountData().getTotalChestCount(), TextFormatting.getTextWithoutFormattingCodes(mythicString), this.chestsDry, player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                                 }
                             }
-                            isMythicInChest = true;
                         }
                     }
                 }
                 // After checking every item in the chest
-                if (isMythicInChest) {
-                    if (!this.hasMythicBeenRegistered) {
-                        this.hasMythicBeenRegistered = true;
-                    }
-                }
+                this.hasChestBeenRegistered = true;
             }
         }
     }
