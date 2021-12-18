@@ -209,19 +209,31 @@ public class EventHandlerClass {
             put("Top Right", new Point(screenWidth - ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2 - 10 - padding, 35));
         }};
 
-        if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry") || ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic")) {
-            Point location = dryCountLocations.get(ChestCountMod.CONFIG.getConfig("dryCountLocation"));
-            if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry")) {
-                ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + 1, Color.BLACK);
-                ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y, Color.WHITE);
-            }
-            if (ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic")) {
-                if (lastMythic.length() != 0) {
-                    ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + 12 + 1, Color.BLACK);
-                    ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + 12, new Color(168, 0, 168));
-                }
+        Point location = dryCountLocations.get(ChestCountMod.CONFIG.getConfig("dryCountLocation"));
+        boolean showChestCount = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowChestCount");
+        boolean showDryStreak = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry");
+        boolean showLastMythic = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic");
+        if (showChestCount) {
+            if (lastMythic.length() != 0) {
+                ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x + 1, location.y + 12 + 1, Color.BLACK);
+                ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x, location.y + 12, Color.WHITE);
             }
         }
+        if (showDryStreak) {
+            // offset balances the displays, so they don't have blank rows
+            final int offset = (showChestCount ? 1 : 0) + 1;
+            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
+            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y + (12 * offset), Color.WHITE);
+        }
+        if (showLastMythic) {
+            if (lastMythic.length() != 0) {
+                // offset balances the displays, so they don't have blank rows
+                final int offset = (showChestCount ? 1 : 0) + (showDryStreak ? 1 : 0);
+                ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + (12 * offset) + 13, Color.BLACK);
+                ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + (12 * offset) + 12, new Color(168, 0, 168));
+            }
+        }
+
     }
 
 }
