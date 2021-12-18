@@ -32,7 +32,7 @@ public class EventHandlerClass {
             TextFormatting.LIGHT_PURPLE, TextFormatting.DARK_BLUE, TextFormatting.DARK_GREEN, TextFormatting.DARK_RED,
             TextFormatting.DARK_PURPLE, TextFormatting.BLUE};
 
-    private boolean hasChestBeenRegistered = false;
+    private boolean hasMythicBeenRegistered = false;
     private int chestsDry = 0;
     private BlockPos chestLocation = null;
 
@@ -43,7 +43,6 @@ public class EventHandlerClass {
         IBlockState state = e.getEntityPlayer().world.getBlockState(pos);
         if (!(state.getBlock() instanceof BlockContainer)) return;
         chestLocation = pos.toImmutable();
-        hasChestBeenRegistered = false; // we could change this to "hasChestBeenRegistered" and set it to true as soon as items were found
     }
 
     @SubscribeEvent
@@ -71,6 +70,7 @@ public class EventHandlerClass {
                 ChestCountMod.getMythicData().addToDry();
                 this.chestsDry = ChestCountMod.getMythicData().getChestsDry();
                 // Defaults to not having a mythic in the chest
+                this.hasMythicBeenRegistered = false;
                 lowerInventory.setCustomName((ChestCountMod.CONFIG.getConfigBoolean("enableColoredName") ? ChestCountMod.getRandom(colors) : "") + containerName + " #" +
                         ChestCountMod.getChestCountData().getSessionChestCount()
                         + " Tot: " + ChestCountMod.getChestCountData().getTotalChestCount());
@@ -104,6 +104,7 @@ public class EventHandlerClass {
                 if (itemCount == 0) {
                     return; // If there are no items on the chest (or the items haven't loaded) just try again basically
                 }
+                boolean isMythicInChest = false;
 
                 for (int i = 0; i < 27; i++) {
                     ItemStack itemStack = lowerInventory.getStackInSlot(i);
@@ -116,7 +117,7 @@ public class EventHandlerClass {
                                 .filter(line -> line.contains("Lv. ")).findFirst();
 
                         if (mythicTier.isPresent()) {
-                            if (!this.hasChestBeenRegistered) { // Makes sure you don't register the same mythic twice (Or just put a mythic into the chest)
+                            if (!hasMythicBeenRegistered) { // Makes sure you don't register the same mythic twice
                                 if (itemLevel.isPresent()) {
                                     try {
                                         // A new mythic has been found!
@@ -134,11 +135,16 @@ public class EventHandlerClass {
                                     }
                                 }
                             }
+                            isMythicInChest = true;
                         }
                     }
                 }
                 // After checking every item in the chest
-                this.hasChestBeenRegistered = true;
+                if (isMythicInChest) {
+                    if (!this.hasMythicBeenRegistered) {
+                        this.hasMythicBeenRegistered = true;
+                    }
+                }
             }
         }
     }
