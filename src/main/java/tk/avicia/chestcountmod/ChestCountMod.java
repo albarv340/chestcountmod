@@ -25,8 +25,10 @@ public class ChestCountMod {
 
     public static final Config CONFIG = new Config(new ConfigSetting[]{
             new ConfigSetting("Randomize color of Loot Chest names", new String[]{"Enabled", "Disabled"}, "Enabled", "enableColoredName"),
+            new ConfigSetting("Say mythic found in chat", new String[]{"Enabled", "Disabled"}, "Enabled", "displayMythicOnFind"),
             new ConfigSetting("Say mythic type in chat on mythic found", new String[]{"Enabled", "Disabled"}, "Enabled", "displayMythicTypeOnFind"),
             new ConfigSetting("Always display chest count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowChestCount"),
+            new ConfigSetting("Always display session chest count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowSessionChestCount"),
             new ConfigSetting("Always display dry count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowDry"),
             new ConfigSetting("Always display last mythic on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowLastMythic"),
             new ConfigSetting("Display location", new String[]{"Below Map", "Center", "Top Right"}, "Below Map", "dryCountLocation")

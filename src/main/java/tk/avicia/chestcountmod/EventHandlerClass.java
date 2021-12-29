@@ -122,10 +122,12 @@ public class EventHandlerClass {
                                     try {
                                         // A new mythic has been found!
                                         String mythicString = itemStack.getDisplayName() + " " + itemLevel.get();
-                                        if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind")) {
-                                            ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
-                                        } else {
-                                            ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                        if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicOnFind")) {
+                                            if (ChestCountMod.CONFIG.getConfigBoolean("displayMythicTypeOnFind")) {
+                                                ChestCountMod.getMC().player.sendMessage(new TextComponentString(mythicString + " : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                            } else {
+                                                ChestCountMod.getMC().player.sendMessage(new TextComponentString(TextFormatting.DARK_PURPLE + "Mythic found : " + TextFormatting.RED + ChestCountMod.getMythicData().getChestsDry() + " dry"));
+                                            }
                                         }
                                         EntityPlayerSP player = ChestCountMod.getMC().player;
                                         ChestCountMod.getMythicData().addMythic(ChestCountMod.getChestCountData().getTotalChestCount(), TextFormatting.getTextWithoutFormattingCodes(mythicString), this.chestsDry, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ());
@@ -155,22 +157,6 @@ public class EventHandlerClass {
             ChestCountMod.getMC().displayGuiScreen(new ConfigsGui());
             ChestCountMod.CONFIG.setShouldGuiConfigBeDrawn(false);
         }
-    }
-
-    public static String getConfig(String configKey) {
-        JsonElement configElement = ChestCountMod.CONFIG.getConfigs().get(configKey);
-
-        if (configElement == null || configElement.isJsonNull()) {
-            return "";
-        } else {
-            return configElement.getAsString();
-        }
-    }
-
-    public static boolean getConfigBoolean(String configKey) {
-        String configValue = getConfig(configKey);
-
-        return configValue.equals("Enabled");
     }
 
 
@@ -211,24 +197,28 @@ public class EventHandlerClass {
 
         Point location = dryCountLocations.get(ChestCountMod.CONFIG.getConfig("dryCountLocation"));
         boolean showChestCount = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowChestCount");
+        boolean showSessionChestCount = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowSessionChestCount");
         boolean showDryStreak = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry");
         boolean showLastMythic = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic");
+        // offset balances the displays, so they don't have blank rows
+        int offset = 0;
         if (showChestCount) {
-            if (lastMythic.length() != 0) {
-                ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x + 1, location.y + 1, Color.BLACK);
-                ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x, location.y, Color.WHITE);
-            }
+            ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x + 1, location.y + 1, Color.BLACK);
+            ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x, location.y, Color.WHITE);
+            offset++;
+        }
+        if (showSessionChestCount) {
+            ChestCountMod.drawCenteredString("Session Chests: " + ChestCountMod.getChestCountData().getSessionChestCount(), location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
+            ChestCountMod.drawCenteredString("Session Chests: " + ChestCountMod.getChestCountData().getSessionChestCount(), location.x, location.y + (12 * offset), Color.WHITE);
+            offset++;
         }
         if (showDryStreak) {
-            // offset balances the displays, so they don't have blank rows
-            final int offset = (showChestCount ? 1 : 0);
             ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
             ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y + (12 * offset), Color.WHITE);
+            offset++;
         }
         if (showLastMythic) {
             if (lastMythic.length() != 0) {
-                // offset balances the displays, so they don't have blank rows
-                final int offset = (showChestCount ? 1 : 0) + (showDryStreak ? 1 : 0);
                 ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
                 ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + (12 * offset), new Color(168, 0, 168));
             }
