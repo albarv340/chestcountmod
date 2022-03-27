@@ -10,10 +10,12 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import tk.avicia.chestcountmod.configs.Config;
-import tk.avicia.chestcountmod.configs.ConfigsCommand;
 import tk.avicia.chestcountmod.configs.ConfigSetting;
+import tk.avicia.chestcountmod.configs.ConfigsCommand;
+import tk.avicia.chestcountmod.configs.locations.Locations;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -31,8 +33,12 @@ public class ChestCountMod {
             new ConfigSetting("Always display session chest count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowSessionChestCount"),
             new ConfigSetting("Always display dry count on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowDry"),
             new ConfigSetting("Always display last mythic on screen", new String[]{"Enabled", "Disabled"}, "Disabled", "alwaysShowLastMythic"),
-            new ConfigSetting("Display location", new String[]{"Below Map", "Center", "Top Right"}, "Below Map", "dryCountLocation")
+            new ConfigSetting("Info location", new String[]{"Edit", "Editing"}, "Edit", "infoLocation")
     });
+
+    public static final Locations LOCATIONS = new Locations(new HashMap<String, String>() {{
+        put("infoLocation", "0.1,0.4");
+    }});
 
     private static final ChestCountData CHEST_COUNT_DATA = new ChestCountData();
     private static final MythicData MYTHIC_DATA = new MythicData();
@@ -75,6 +81,7 @@ public class ChestCountMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         CONFIG.initializeConfigs();
+        LOCATIONS.initializeLocations();
     }
 
 }

@@ -1,11 +1,8 @@
 package tk.avicia.chestcountmod;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.Container;
@@ -22,10 +19,13 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import tk.avicia.chestcountmod.configs.ConfigsGui;
+import tk.avicia.chestcountmod.configs.locations.LocationsGui;
+import tk.avicia.chestcountmod.configs.locations.MultipleElements;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class EventHandlerClass {
     private static final TextFormatting[] colors = {TextFormatting.DARK_GRAY, TextFormatting.BLACK, TextFormatting.RED,
@@ -157,6 +157,12 @@ public class EventHandlerClass {
             ChestCountMod.getMC().displayGuiScreen(new ConfigsGui());
             ChestCountMod.CONFIG.setShouldGuiConfigBeDrawn(false);
         }
+        // Clicking the edit button in the Info Location configs changes its value to Editing, so when that happens we
+        // open up the locations editing gui
+        if (ChestCountMod.CONFIG.getConfig("infoLocation").equals("Editing")) {
+            ChestCountMod.getMC().displayGuiScreen(new LocationsGui());
+            ChestCountMod.CONFIG.setConfig("infoLocation", "Edit");
+        }
     }
 
 
@@ -164,64 +170,9 @@ public class EventHandlerClass {
     public void renderOverlay(RenderGameOverlayEvent.Chat event) {
         // The Chat RenderGameOverlayEvent renders stuff normally, it disappears in f1, you can see it when your
         // inventory is open and you can make stuff transparent
-        ScaledResolution scaledResolution = new ScaledResolution(ChestCountMod.getMC());
-        int screenWidth = scaledResolution.getScaledWidth();
-        int screenHeight = scaledResolution.getScaledHeight();
-
-        int dry = ChestCountMod.getMythicData().getChestsDry();
-        String lastMythic = "";
-        try {
-            JsonObject lastMythicObject = ChestCountMod.getMythicData().getLastMythic();
-            if (lastMythicObject != null) {
-                lastMythic = lastMythicObject.get("mythic").getAsString();
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        String shortLastMythic = "";
-        if (lastMythic.length() != 0) {
-            try {
-                String[] wordsInString = lastMythic.split(" ");
-                shortLastMythic = wordsInString[1] + " " + wordsInString[wordsInString.length - 1];
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
-        }
-        String finalLastMythic = "Last Mythic: " + shortLastMythic;
-        int padding = lastMythic.length() == 0 ? ChestCountMod.getMC().fontRenderer.getStringWidth("" + dry) / 2 : 0;
-        final Map<String, Point> dryCountLocations = new HashMap<String, Point>() {{
-            put("Center", new Point(screenWidth / 2, 20));
-            put("Below Map", new Point(padding + 10 + ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2, screenHeight / 2 - 20));
-            put("Top Right", new Point(screenWidth - ChestCountMod.getMC().fontRenderer.getStringWidth(finalLastMythic) / 2 - 10 - padding, 35));
-        }};
-
-        Point location = dryCountLocations.get(ChestCountMod.CONFIG.getConfig("dryCountLocation"));
-        boolean showChestCount = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowChestCount");
-        boolean showSessionChestCount = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowSessionChestCount");
-        boolean showDryStreak = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowDry");
-        boolean showLastMythic = ChestCountMod.CONFIG.getConfigBoolean("alwaysShowLastMythic");
-        // offset balances the displays, so they don't have blank rows
-        int offset = 0;
-        if (showChestCount) {
-            ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x + 1, location.y + 1, Color.BLACK);
-            ChestCountMod.drawCenteredString("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x, location.y, Color.WHITE);
-            offset++;
-        }
-        if (showSessionChestCount) {
-            ChestCountMod.drawCenteredString("Session Chests: " + ChestCountMod.getChestCountData().getSessionChestCount(), location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
-            ChestCountMod.drawCenteredString("Session Chests: " + ChestCountMod.getChestCountData().getSessionChestCount(), location.x, location.y + (12 * offset), Color.WHITE);
-            offset++;
-        }
-        if (showDryStreak) {
-            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
-            ChestCountMod.drawCenteredString("Chests dry: " + dry, location.x, location.y + (12 * offset), Color.WHITE);
-            offset++;
-        }
-        if (showLastMythic) {
-            if (lastMythic.length() != 0) {
-                ChestCountMod.drawCenteredString(finalLastMythic, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK);
-                ChestCountMod.drawCenteredString(finalLastMythic, location.x, location.y + (12 * offset), new Color(168, 0, 168));
-            }
+        MultipleElements elements = InfoDisplay.getElementsToDraw();
+        if(elements != null) {
+            elements.draw();
         }
 
     }

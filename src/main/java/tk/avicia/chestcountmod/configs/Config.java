@@ -10,6 +10,7 @@ public class Config {
     private boolean shouldGuiConfigBeDrawn = false;
     private JsonObject configs = null;
     private ConfigSetting[] configsArray;
+    private CustomFile configsFile;
 
     public Config(ConfigSetting[] configsArray) {
         this.configsArray = configsArray;
@@ -25,6 +26,14 @@ public class Config {
         }
     }
 
+    public void setConfig(String configKey, String value) {
+        JsonObject configsJson = this.configsFile.readJson();
+        configsJson.addProperty(configKey, value);
+
+        ChestCountMod.CONFIG.setConfigs(configsJson);
+        this.configsFile.writeJson(configsJson);
+    }
+
     /*
      * If the setting is a boolean and is true, this will return true, otherwise false
      */
@@ -35,7 +44,7 @@ public class Config {
     }
 
     public void initializeConfigs() {
-        CustomFile configsFile = new CustomFile(ChestCountMod.getMC().mcDataDir, "chestcountmod/configs/configs.json");
+        configsFile = new CustomFile(ChestCountMod.getMC().mcDataDir, "chestcountmod/configs/configs.json");
         JsonObject configsJson = configsFile.readJson();
         boolean changed = false;
 
