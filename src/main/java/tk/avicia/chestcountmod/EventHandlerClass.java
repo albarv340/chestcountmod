@@ -171,10 +171,7 @@ public class EventHandlerClass {
         // The Chat RenderGameOverlayEvent renders stuff normally, it disappears in f1, you can see it when your
         // inventory is open and you can make stuff transparent
         MultipleElements elements = InfoDisplay.getElementsToDraw();
-        if(elements != null) {
-            elements.draw();
-        }
-
+        elements.draw();
     }
 
 }

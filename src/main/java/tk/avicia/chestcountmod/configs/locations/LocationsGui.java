@@ -7,6 +7,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Mouse;
 import tk.avicia.chestcountmod.ChestCountMod;
 import tk.avicia.chestcountmod.InfoDisplay;
+import tk.avicia.chestcountmod.configs.BackButton;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class LocationsGui extends GuiScreen {
                 InfoDisplay.getElementsToDraw()
         );
         buttonList.add(new ResetButton(0, this.width / 2 - 50, this.height - 30, 100, 20, "Reset to Defaults", this));
+        buttonList.add(new BackButton(1, 10, 10, 40, 20, "Back"));
         isOpen = true;
     }
 

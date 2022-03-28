@@ -50,8 +50,8 @@ public class InfoDisplay {
             offset++;
         }
         if (showDryStreak) {
-            elementsList.add(new TextElement("Chests dry: " + dry, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK));
-            elementsList.add(new TextElement("Chests dry: " + dry, location.x, location.y + (12 * offset), Color.WHITE));
+            elementsList.add(new TextElement("Chests Dry: " + dry, location.x + 1, location.y + (12 * offset) + 1, Color.BLACK));
+            elementsList.add(new TextElement("Chests Dry: " + dry, location.x, location.y + (12 * offset), Color.WHITE));
             offset++;
         }
         if (showLastMythic) {
