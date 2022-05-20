@@ -15,6 +15,12 @@ public class MythicData {
         return mythicData.readJson();
     }
 
+    public JsonObject getDryData() {
+        CustomFile dryData = new CustomFile(ChestCountMod.getMC().mcDataDir, "chestcountmod/dryCount.json");
+
+        return dryData.readJson();
+    }
+
     public void addMythic(int chestCount, String mythic, int dry, int x, int y, int z) {
         try {
 
@@ -46,13 +52,26 @@ public class MythicData {
             } else {
                 chestsDry = ChestCountMod.getChestCountData().getTotalChestCount();
             }
-        } catch (IllegalStateException e) {
+            saveDryToFile();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void addToDry() {
         chestsDry++;
+        try {
+            saveDryToFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveDryToFile() {
+        JsonObject currentData = getDryData();
+        currentData.addProperty(ChestCountMod.PLAYER_UUID, chestsDry);
+        CustomFile mythicData = new CustomFile(ChestCountMod.getMC().mcDataDir, "chestcountmod/dryCount.json");
+        mythicData.writeJson(currentData);
     }
 
     public int getChestsDry() {
