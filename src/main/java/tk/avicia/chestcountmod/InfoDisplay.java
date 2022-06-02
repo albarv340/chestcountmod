@@ -5,6 +5,8 @@ import tk.avicia.chestcountmod.configs.locations.MultipleElements;
 import tk.avicia.chestcountmod.configs.locations.TextElement;
 
 import java.awt.*;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.ArrayList;
 
 public class InfoDisplay {
