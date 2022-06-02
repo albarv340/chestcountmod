@@ -39,9 +39,10 @@ public class InfoDisplay {
 
         // offset balances the displays, so they don't have blank rows
         int offset = 0;
+        String chestCount = NumberFormat.getNumberInstance(Locale.GERMAN).format(ChestCountMod.getChestCountData().getTotalChestCount());
         if (showChestCount) {
-            elementsList.add(new TextElement("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x + 1, location.y + 1, Color.BLACK));
-            elementsList.add(new TextElement("Chests Opened: " + ChestCountMod.getChestCountData().getTotalChestCount(), location.x, location.y, Color.WHITE));
+            elementsList.add(new TextElement("Chests Opened: " + chestCount, location.x + 1, location.y + 1, Color.BLACK));
+            elementsList.add(new TextElement("Chests Opened: " + chestCount, location.x, location.y, Color.WHITE));
             offset++;
         }
         if (showSessionChestCount) {
